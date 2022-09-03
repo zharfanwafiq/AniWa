@@ -1,27 +1,27 @@
 package com.zharfan.aniwa.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.zharfan.aniwa.R
 import com.zharfan.aniwa.adapter.ListEpisodeAdapter
+import com.zharfan.aniwa.data.repository.Result
 import com.zharfan.aniwa.data.response.detailanime.Data
-import com.zharfan.aniwa.data.response.detailanime.EpisodesListItem
 import com.zharfan.aniwa.data.viewmodel.main.DetailViewModel
 import com.zharfan.aniwa.databinding.FragmentDetailBinding
+import com.zharfan.aniwa.factory.MainViewModelFactory
 
 
 class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
-
-    private val viewModel: DetailViewModel by viewModels()
 
     private var animeId: String = ""
 
@@ -37,9 +37,33 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val factory: MainViewModelFactory = MainViewModelFactory.getInstance()
+        val viewModel: DetailViewModel by viewModels {
+            factory
+        }
 
         initBundle()
-        initObserve()
+
+        viewModel.getDetailAnime(animeId).observe(viewLifecycleOwner) {
+            if (it != null) {
+                when (it) {
+                    is Result.Loading -> showLoading(true)
+                    is Result.Success -> {
+                        showLoading(false)
+                        showDetailData(it.data)
+                    }
+
+                    is Result.Error -> {
+                        showLoading(false)
+                        Toast.makeText(
+                            requireContext(),
+                            "Terjadi Kesalahan ${it.error}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
 
     }
 
@@ -66,48 +90,18 @@ class DetailFragment : Fragment() {
 
     }
 
-    private fun setRecycleView()= with(binding){
+    private fun setRecycleView() = with(binding) {
         listEpisodeAdapter = ListEpisodeAdapter()
-        with(rvListEpisode){
-            layoutManager = GridLayoutManager(requireContext(),4)
+        with(rvListEpisode) {
+            layoutManager = GridLayoutManager(requireContext(), 4)
             setHasFixedSize(true)
             adapter = listEpisodeAdapter
         }
     }
 
-    private fun setData(episodesList: List<EpisodesListItem>){
-        if (episodesList.isNotEmpty()){
-            listEpisodeAdapter.submitList(episodesList)
-        }
-
-    }
-
-    private fun initObserve() {
-
-        viewModel.showDetailAnime(animeId)
-        viewModel.detailAnime.observe(viewLifecycleOwner) {
-            showDetailData(it)
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
-        }
-
-        viewModel.listEpisode.observe(viewLifecycleOwner){
-            setData(it)
-        }
-
-    }
-
-
     private fun showLoading(isShow: Boolean) = with(binding) {
-        progressBar.visibility = if (isShow) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        progressBar.isVisible = isShow
     }
-
 
     companion object {
         const val ANIME_ID = "anime-id"

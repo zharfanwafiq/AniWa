@@ -38,11 +38,10 @@ class TopWeeklyAdapter :
 
             gridRecentAnime.setOnClickListener {
                 val bundle = Bundle()
-                bundle.putString(DetailFragment.ANIME_ID,dataItem.animeId)
-                it.findNavController().navigate(R.id.detailFragment,bundle)
+                bundle.putString(DetailFragment.ANIME_ID, dataItem.animeId)
+                it.findNavController().navigate(R.id.detailFragment, bundle)
 
             }
-
         }
     }
 
@@ -55,9 +54,6 @@ class TopWeeklyAdapter :
             override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
                 return oldItem.animeTitle == newItem.animeTitle
             }
-
         }
-
-
     }
 }
