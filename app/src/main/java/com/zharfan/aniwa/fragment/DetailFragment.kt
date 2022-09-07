@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.zharfan.aniwa.adapter.ListEpisodeAdapter
 import com.zharfan.aniwa.data.repository.Result
 import com.zharfan.aniwa.data.response.detailanime.Data
+import com.zharfan.aniwa.data.response.detailanime.EpisodesListItem
 import com.zharfan.aniwa.data.viewmodel.main.DetailViewModel
 import com.zharfan.aniwa.databinding.FragmentDetailBinding
 import com.zharfan.aniwa.factory.MainViewModelFactory
@@ -43,27 +44,24 @@ class DetailFragment : Fragment() {
         }
 
         initBundle()
+        setRecycleView()
 
         viewModel.getDetailAnime(animeId).observe(viewLifecycleOwner) {
-            if (it != null) {
-                when (it) {
-                    is Result.Loading -> showLoading(true)
-                    is Result.Success -> {
-                        showLoading(false)
-                        showDetailData(it.data)
-                    }
+            when (it) {
+                is Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    showDetailData(it.data)
+                    setData(it.data.episodesList)
+                }
 
-                    is Result.Error -> {
-                        showLoading(false)
-                        Toast.makeText(
-                            requireContext(),
-                            "Terjadi Kesalahan ${it.error}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                is Result.Error -> {
+                    showLoading(false)
+                    showToast("Terjadi Kesalahan ${it.error}")
                 }
             }
         }
+
 
     }
 
@@ -86,30 +84,36 @@ class DetailFragment : Fragment() {
         tvAnimeReleaseDate.text = "Date Aired: ${data.releasedDate}"
         tvAnimeTotalEps.text = "Total Eps: ${data.totalEpisodes}"
 
-        setRecycleView()
-
     }
 
     private fun setRecycleView() = with(binding) {
         listEpisodeAdapter = ListEpisodeAdapter()
         with(rvListEpisode) {
-            layoutManager = GridLayoutManager(requireContext(), 4)
-            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(requireContext(), 5)
             adapter = listEpisodeAdapter
+
         }
     }
 
-    private fun showLoading(isShow: Boolean) = with(binding) {
-        progressBar.isVisible = isShow
+    private fun setData(episodesList: List<EpisodesListItem>) {
+        if (episodesList.isNotEmpty()) {
+            listEpisodeAdapter.submitList(episodesList)
+        }
     }
 
-    companion object {
-        const val ANIME_ID = "anime-id"
+    private fun showLoading(isShow: Boolean) = binding.progressBar.isVisible == isShow
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
 
+    }
+
+    companion object {
+        const val ANIME_ID = "anime-id"
     }
 }

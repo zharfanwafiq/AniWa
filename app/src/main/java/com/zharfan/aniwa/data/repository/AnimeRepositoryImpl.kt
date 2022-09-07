@@ -21,7 +21,7 @@ class AnimeRepositoryImpl private constructor(
 
     private val detailAnime = MutableLiveData<Result<Data>>()
 
-    private val listEpisode = MutableLiveData<List<EpisodesListItem>>()
+    private val listEpisode = MutableLiveData<Result<List<EpisodesListItem>>>()
 
 
     override fun showRecentAnimeList(): LiveData<Result<List<DataItem>>> {
@@ -41,7 +41,7 @@ class AnimeRepositoryImpl private constructor(
                 }
 
                 override fun onFailure(call: Call<TopWeeklyAnimeResponse>, t: Throwable) {
-                    Log.e("animeFailed", "onFailure: ${t}")
+                    Log.e("animeFailed", "${t.printStackTrace()}")
                 }
             })
         return listTopWeeklyAnime
@@ -59,7 +59,9 @@ class AnimeRepositoryImpl private constructor(
                     if (response.isSuccessful) {
                         val listDetailAnime = response.body()?.data
                         detailAnime.postValue(Result.Success(listDetailAnime as Data))
-                        listEpisode.value = response.body()?.data?.episodesList
+
+                        val listEpisodeAnime = response.body()?.data?.episodesList
+                        listEpisode.postValue(Result.Success(listEpisodeAnime as List<EpisodesListItem>))
                     }
                 }
 

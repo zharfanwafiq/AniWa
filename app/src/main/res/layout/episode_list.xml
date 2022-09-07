@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/tvAnimeTitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:padding="8dp"
@@ -27,7 +27,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="One Piece Episode 1 Subtitle Indonesia" />
+            tools:text="1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
