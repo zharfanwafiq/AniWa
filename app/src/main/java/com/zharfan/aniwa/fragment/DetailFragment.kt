@@ -17,6 +17,7 @@ import com.zharfan.aniwa.data.response.detailanime.EpisodesListItem
 import com.zharfan.aniwa.data.viewmodel.main.DetailViewModel
 import com.zharfan.aniwa.databinding.FragmentDetailBinding
 import com.zharfan.aniwa.factory.MainViewModelFactory
+import com.zharfan.aniwa.utils.Common
 
 
 class DetailFragment : Fragment() {
@@ -57,7 +58,7 @@ class DetailFragment : Fragment() {
 
                 is Result.Error -> {
                     showLoading(false)
-                    showToast("Terjadi Kesalahan ${it.error}")
+                    Common.showToast(requireContext(),"Terjadi Kesalahan ${it.error}")
                 }
             }
         }
@@ -102,10 +103,6 @@ class DetailFragment : Fragment() {
     }
 
     private fun showLoading(isShow: Boolean) = binding.progressBar.isVisible == isShow
-
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

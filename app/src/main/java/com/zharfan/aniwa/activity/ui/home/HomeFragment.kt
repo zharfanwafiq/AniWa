@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +13,7 @@ import com.zharfan.aniwa.data.repository.Result
 import com.zharfan.aniwa.data.viewmodel.main.MainViewModel
 import com.zharfan.aniwa.databinding.FragmentHomeBinding
 import com.zharfan.aniwa.factory.MainViewModelFactory
+import com.zharfan.aniwa.utils.Common
 
 class HomeFragment : Fragment() {
 
@@ -52,11 +52,7 @@ class HomeFragment : Fragment() {
 
                     is Result.Error -> {
                         showLoading(false)
-                        Toast.makeText(
-                            requireContext(),
-                            "Terjadi Kesalahan ${it.error}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Common.showToast(requireContext(), "Terjadi Kesalahan ${it.error}")
 
                     }
                 }
