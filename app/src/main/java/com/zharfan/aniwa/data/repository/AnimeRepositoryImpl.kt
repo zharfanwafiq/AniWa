@@ -9,12 +9,16 @@ import com.zharfan.aniwa.data.response.detailanime.DetailAnimeResponse
 import com.zharfan.aniwa.data.response.detailanime.EpisodesListItem
 import com.zharfan.aniwa.data.response.topweekly.DataItem
 import com.zharfan.aniwa.data.response.topweekly.TopWeeklyAnimeResponse
+import com.zharfan.aniwa.data.room.RecentAnimeDao
+import com.zharfan.aniwa.utils.recentanime.AppExecutors
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class AnimeRepositoryImpl private constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val recentAnimeDao: RecentAnimeDao,
+    private val appExecutors: AppExecutors
 ) : AnimeRepository {
 
     private val listTopWeeklyAnime = MutableLiveData<Result<List<DataItem>>>()
@@ -77,9 +81,11 @@ class AnimeRepositoryImpl private constructor(
         private var instance: AnimeRepositoryImpl? = null
         fun getInstance(
             apiService: ApiService,
+            recentAnimeDao: RecentAnimeDao,
+            appExecutors: AppExecutors
         ): AnimeRepositoryImpl =
             instance ?: synchronized(this) {
-                instance ?: AnimeRepositoryImpl(apiService)
+                instance ?: AnimeRepositoryImpl(apiService, recentAnimeDao, appExecutors)
             }.also { instance = it }
     }
 }
