@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,6 +16,7 @@ import com.zharfan.aniwa.data.viewmodel.main.DetailViewModel
 import com.zharfan.aniwa.databinding.FragmentDetailBinding
 import com.zharfan.aniwa.factory.MainViewModelFactory
 import com.zharfan.aniwa.utils.Common
+import com.zharfan.aniwa.utils.Common.isNetworkEnabled
 
 
 class DetailFragment : Fragment() {
@@ -39,13 +38,40 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val factory: MainViewModelFactory = MainViewModelFactory.getInstance()
+
+
+        initBundle()
+        checkConnectionEnabled()
+    }
+
+    private fun checkConnectionEnabled() {
+        if (isNetworkEnabled(requireContext())) {
+            setRecycleView()
+            initObserve()
+        } else {
+            showNoNetworkConnection(true)
+        }
+    }
+
+    private fun showNoNetworkConnection(isShow: Boolean) = with(binding) {
+        if (isShow) {
+            shimmerLoadingMain.visibility = View.GONE
+            rvListEpisode.visibility = View.GONE
+            layoutNoConnectionVisibility.visibility = View.VISIBLE
+            layoutNoConnection.btnRetry.setOnClickListener {
+                checkConnectionEnabled()
+            }
+        } else {
+            layoutNoConnectionVisibility.visibility = View.GONE
+        }
+
+    }
+
+    private fun initObserve() {
+        val factory: MainViewModelFactory = MainViewModelFactory.getInstance(requireContext())
         val viewModel: DetailViewModel by viewModels {
             factory
         }
-
-        initBundle()
-        setRecycleView()
 
         viewModel.getDetailAnime(animeId).observe(viewLifecycleOwner) {
             when (it) {
@@ -58,13 +84,12 @@ class DetailFragment : Fragment() {
 
                 is Result.Error -> {
                     showLoading(false)
-                    Common.showToast(requireContext(),"Terjadi Kesalahan ${it.error}")
+                    Common.showToast(requireContext(), "Terjadi Kesalahan ${it.error}")
                 }
             }
         }
-
-
     }
+
 
     private fun initBundle() {
         val argument = arguments
@@ -102,7 +127,17 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun showLoading(isShow: Boolean) = binding.progressBar.isVisible == isShow
+    private fun showLoading(isShow: Boolean) = with(binding) {
+        if (isShow) {
+            shimmerLoadingMain.visibility = View.VISIBLE
+            rvListEpisode.visibility = View.GONE
+            layoutDetailVisibility.visibility = View.GONE
+        } else {
+            shimmerLoadingMain.visibility = View.GONE
+            rvListEpisode.visibility = View.VISIBLE
+            layoutDetailVisibility.visibility = View.VISIBLE
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

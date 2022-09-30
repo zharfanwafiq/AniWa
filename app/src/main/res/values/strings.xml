@@ -10,4 +10,8 @@
     <string name="history">History</string>
     <string name="title_favorite">Favorite</string>
     <string name="animepicture">AnimePicture</string>
+    <string name="no_network">Tidak ada Jaringan</string>
+    <string name="no_network_text">Tidak Tersambung Ke Internet!</string>
+    <string name="try_again">Coba Lagi</string>
+    <string name="no_network_description">Periksa Sambungan dan Coba Lagi</string>
 </resources>
