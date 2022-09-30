@@ -41,8 +41,8 @@ class HomeFragment : Fragment() {
         setSwipeRefresh()
     }
 
-    private fun setSwipeRefresh() = with(binding) {
-        with(swipeRefreshMain) {
+    private fun setSwipeRefresh() {
+        binding.swipeRefreshMain.apply {
             setColorSchemeColors(R.color.purple_700)
             setOnRefreshListener { checkConnectionEnabled() }
         }
