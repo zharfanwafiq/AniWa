@@ -1,5 +1,6 @@
 package com.zharfan.aniwa.factory
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.zharfan.aniwa.data.repository.AnimeRepository
@@ -25,9 +26,9 @@ class MainViewModelFactory private constructor(
     companion object {
         @Volatile
         private var instance: MainViewModelFactory? = null
-        fun getInstance(): MainViewModelFactory =
+        fun getInstance(context: Context): MainViewModelFactory =
             instance ?: synchronized(this) {
-                instance ?: MainViewModelFactory(Injection.provideRepository())
+                instance ?: MainViewModelFactory(Injection.provideRepository(context))
             }.also { instance = it }
     }
 

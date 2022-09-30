@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.zharfan.aniwa.R
 import com.zharfan.aniwa.adapter.TopWeeklyAdapter
 import com.zharfan.aniwa.data.repository.Result
 import com.zharfan.aniwa.data.viewmodel.main.MainViewModel
 import com.zharfan.aniwa.databinding.FragmentHomeBinding
 import com.zharfan.aniwa.factory.MainViewModelFactory
 import com.zharfan.aniwa.utils.Common
+import com.zharfan.aniwa.utils.Common.isNetworkEnabled
 
 class HomeFragment : Fragment() {
 
@@ -34,12 +36,46 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val factory: MainViewModelFactory = MainViewModelFactory.getInstance()
+
+        checkConnectionEnabled()
+        setSwipeRefresh()
+    }
+
+    private fun setSwipeRefresh() = with(binding) {
+        with(swipeRefreshMain) {
+            setColorSchemeColors(R.color.purple_700)
+            setOnRefreshListener { checkConnectionEnabled() }
+        }
+    }
+
+    private fun checkConnectionEnabled() {
+        if (isNetworkEnabled(requireContext())) {
+            setRecycleView()
+            initObserve()
+        } else {
+            showNoNetworkConnection(true)
+        }
+    }
+
+    private fun showNoNetworkConnection(isShow: Boolean) = with(binding) {
+        if (isShow) {
+            shimmerLoadingMain.visibility = View.GONE
+            rvRecentAnime.visibility = View.GONE
+            swipeRefreshMain.isRefreshing = false
+            layoutNoConnectionVisibility.visibility = View.VISIBLE
+            layoutNoConnection.btnRetry.setOnClickListener {
+                checkConnectionEnabled()
+            }
+        } else {
+            layoutNoConnectionVisibility.visibility = View.GONE
+        }
+    }
+
+    private fun initObserve() {
+        val factory: MainViewModelFactory = MainViewModelFactory.getInstance(requireContext())
         val viewModel: MainViewModel by viewModels {
             factory
         }
-
-        setRecycleView()
 
         viewModel.getRecentAnime.observe(viewLifecycleOwner) {
             if (it != null) {
@@ -63,6 +99,7 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        topWeeklyAdapter = null
     }
 
     private fun setRecycleView() {
@@ -77,10 +114,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun showLoading(isShow: Boolean) = with(binding) {
-        progressBar.visibility = if (isShow) {
-            View.VISIBLE
+        if (isShow) {
+            shimmerLoadingMain.visibility = View.VISIBLE
+            rvRecentAnime.visibility = View.GONE
+            swipeRefreshMain.isRefreshing = true
         } else {
-            View.GONE
+            shimmerLoadingMain.visibility = View.GONE
+            rvRecentAnime.visibility = View.VISIBLE
+            swipeRefreshMain.isRefreshing = false
         }
     }
 }

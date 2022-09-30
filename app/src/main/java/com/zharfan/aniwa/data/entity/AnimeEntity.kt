@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "recentAnime")
-class RecentAnimeEntity(
+class AnimeEntity(
     @field:ColumnInfo(name = "animeId")
     @field:PrimaryKey
     val animeId: String,
